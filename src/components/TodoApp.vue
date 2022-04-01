@@ -34,7 +34,7 @@
             </div>
           </td>
           <td>
-            <div>
+            <div @click="deleteTask(index)">
               <span class="fa fa-trash"></span>
             </div>
           </td>
@@ -97,6 +97,14 @@ export default {
         status: 'to-do',
         priority: 'low'
       })
+
+      this.task = ''
+    },
+
+    deleteTask(index){
+      // splice() - can add/remove items in array
+      // at position index, remove 1 item
+      this.tasks.splice(index, 1);
     }
   }
 }
