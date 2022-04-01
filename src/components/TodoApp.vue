@@ -4,11 +4,20 @@
     <h2 class="text-center mt-5 mb-5">My Vue Todo App</h2>
 
     <!--- Input -->
-    <div class="d-flex mb-5">
-      <!-- v-model: 2-way binding -->
-      <!-- in script tag, it is empty string but if we put value to it, it will appear in this input tag -->
-      <input v-model="task" type="text" class="form-control" placeholder="Enter task">
-      <button @click="submitTask" class="btn btn-warning rounded-0">SUBMIT</button>
+    <div class="row g-3 d-flex justify-content-center mb-5">
+      <div class="col-8 col-sm-6">
+        <!-- v-model: 2-way binding -->
+        <!-- in script tag, it is empty string but if we put value to it, it will appear in this input tag -->
+        <input v-model="task" type="text" class="form-control" placeholder="Enter task">
+      </div>
+      <div class="col-2">
+        <button
+          type="button"
+          @click="submitTask"
+          class="btn btn-warning"
+          >SUBMIT
+        </button>
+      </div>
     </div>
 
     <table class="table table-bordered">
