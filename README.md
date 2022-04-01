@@ -1,24 +1,10 @@
 # vue2-todo-app
 
+A vue todo app version 2 with much better UI using bootstrap.
 ## Project setup
 ```
-yarn install
+git clone https://github.com/nasuhasri/vue2-todo-app.git
+cd vue2-todo-app
+npm install
+npm run serve
 ```
-
-### Compiles and hot-reloads for development
-```
-yarn serve
-```
-
-### Compiles and minifies for production
-```
-yarn build
-```
-
-### Lints and fixes files
-```
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
