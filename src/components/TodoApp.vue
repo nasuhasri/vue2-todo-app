@@ -25,9 +25,13 @@
       <tbody>
         <tr v-for="(task, index) in tasks" :key="index">
           <td>{{ task.id }}</td>
-          <td>{{ task.name }}</td>
+          <td>
+            <span :class="{'finished': task.status === 'finished'}">{{ task.name }}</span>
+          </td>
           <td style="width: 120px">
-            <span class="pointer" @click="changeStatus(index)">{{ task.status }}</span>
+            <span class="pointer fw-bold" @click="changeStatus(index)" :class="{'text-danger': task.status === 'to-do', 'text-warning': task.status === 'in-progress', 'text-success': task.status === 'finished'}">
+              {{ firstCharUpper(task.status) }}
+            </span>
           </td>
           <!-- <td>
             <select class="form-select" aria-label="Default select example">
@@ -138,7 +142,15 @@ export default {
 
       if(++newIndex > 2) { newIndex = 0 }
 
+      // change status
       this.tasks[index].status = this.availableStatus[newIndex];
+    },
+
+    firstCharUpper(str){
+      // finished
+      // str.charAt(0).toUpperCase() - f -> F
+      // str.slice(1) - will take all -> inished
+      return str.charAt(0).toUpperCase() + str.slice(1);
     }
   }
 }
@@ -148,5 +160,9 @@ export default {
 <style scoped>
 .pointer{
   cursor: pointer;
+}
+
+.finished{
+  text-decoration: line-through;
 }
 </style>
