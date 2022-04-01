@@ -26,7 +26,17 @@
         <tr v-for="(task, index) in tasks" :key="index">
           <td>{{ task.id }}</td>
           <td>{{ task.name }}</td>
-          <td>{{ task.status }}</td>
+          <td style="width: 120px">
+            <span class="pointer" @click="changeStatus(index)">{{ task.status }}</span>
+          </td>
+          <!-- <td>
+            <select class="form-select" aria-label="Default select example">
+              <option selected>Open this select menu</option>
+              <option value="1">One</option>
+              <option value="2">Two</option>
+              <option value="3">Three</option>
+            </select>
+          </td> -->
           <td>{{ task.priority }}</td>
           <td>
             <div @click="editTask(index)">
@@ -57,6 +67,8 @@ export default {
       task: '',
       // var for edited task by user
       editedTask: null,
+      availableStatus: ['to-do', 'in-progress', 'finished'],
+
       tasks: [
         {
           id: 1, 
@@ -119,6 +131,14 @@ export default {
     editTask(index){
       this.task = this.tasks[index].name;
       this.editedTask = index;
+    },
+
+    changeStatus(index){
+      let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
+
+      if(++newIndex > 2) { newIndex = 0 }
+
+      this.tasks[index].status = this.availableStatus[newIndex];
     }
   }
 }
@@ -126,5 +146,7 @@ export default {
 </script>
 
 <style scoped>
-
+.pointer{
+  cursor: pointer;
+}
 </style>
