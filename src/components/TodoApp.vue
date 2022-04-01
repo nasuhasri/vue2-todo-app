@@ -29,7 +29,7 @@
           <td>{{ task.status }}</td>
           <td>{{ task.priority }}</td>
           <td>
-            <div>
+            <div @click="editTask(index)">
               <span class="fa fa-pen"></span>
             </div>
           </td>
@@ -53,7 +53,10 @@ export default {
   data(){ 
     return { 
       // to get value from input
+      // var for new task
       task: '',
+      // var for edited task by user
+      editedTask: null,
       tasks: [
         {
           id: 1, 
@@ -91,12 +94,18 @@ export default {
 
       if(this.task.length === 0) { return }
 
-      this.tasks.push({
-        id: Math.floor(Math.random() * 1001),
-        name: this.task,
-        status: 'to-do',
-        priority: 'low'
-      })
+      if(this.editedTask === null) {
+        this.tasks.push({
+          id: Math.floor(Math.random() * 1001),
+          name: this.task,
+          status: 'to-do',
+          priority: 'low'
+        })
+      } else {
+        // this.editedTask return the index of the array that need to be edited
+        this.tasks[this.editedTask].name = this.task;
+        this.editedTask = null;
+      }
 
       this.task = ''
     },
@@ -105,6 +114,11 @@ export default {
       // splice() - can add/remove items in array
       // at position index, remove 1 item
       this.tasks.splice(index, 1);
+    },
+
+    editTask(index){
+      this.task = this.tasks[index].name;
+      this.editedTask = index;
     }
   }
 }
