@@ -5,18 +5,32 @@
 
     <!--- Input -->
     <div class="row g-3 d-flex justify-content-center mb-5">
-      <div class="col-8 col-sm-6">
-        <!-- v-model: 2-way binding -->
-        <!-- in script tag, it is empty string but if we put value to it, it will appear in this input tag -->
-        <input v-model="task" type="text" class="form-control" placeholder="Enter task">
-      </div>
-      <div class="col-2">
+      <div class="alert alert-danger alert-dismissible fade show" role="alert" v-show="isVisible">
+        <span class="fa-solid fa-triangle-exclamation"></span>
+        Please ensure all the inputs are filled in!
         <button
           type="button"
-          @click="submitTask"
-          class="btn btn-warning"
-          >SUBMIT
-        </button>
+          class="btn-close"
+          data-bs-dismiss="alert"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="col-6 col-sm-6">
+        <!-- v-model: 2-way binding -->
+        <!-- in script tag, it is empty string but if we put value to it, it will appear in this input tag -->
+        <input v-model="newTask" type="text" class="form-control" placeholder="Enter task" />
+      </div>
+      <div class="col-6 col-sm-6">
+        <select v-model="selectedPriority" class="form-select" aria-label="Default select example">
+          <option disabled value selected>Select Priority Level</option>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+          <option value="urgent">Urgent</option>
+        </select>
+      </div>
+      <div class="col-2">
+        <button type="button" @click="submitTask" class="btn btn-warning">SUBMIT</button>
       </div>
     </div>
 
@@ -38,19 +52,13 @@
             <span :class="{'finished': task.status === 'finished'}">{{ task.name }}</span>
           </td>
           <td style="width: 120px">
-            <span class="pointer fw-bold" @click="changeStatus(index)" :class="{'text-danger': task.status === 'to-do', 'text-warning': task.status === 'in-progress', 'text-success': task.status === 'finished'}">
-              {{ firstCharUpper(task.status) }}
-            </span>
+            <span
+              class="pointer fw-bold"
+              @click="changeStatus(index)"
+              :class="{'text-danger': task.status === 'to-do', 'text-warning': task.status === 'in-progress', 'text-success': task.status === 'finished'}"
+            >{{ firstCharUpper(task.status) }}</span>
           </td>
-          <!-- <td>
-            <select class="form-select" aria-label="Default select example">
-              <option selected>Open this select menu</option>
-              <option value="1">One</option>
-              <option value="2">Two</option>
-              <option value="3">Three</option>
-            </select>
-          </td> -->
-          <td>{{ task.priority }}</td>
+          <td>{{ firstCharUpper(task.priority) }}</td>
           <td>
             <div @click="editTask(index)">
               <span class="fa fa-pen"></span>
@@ -64,114 +72,118 @@
         </tr>
       </tbody>
     </table>
-
-
   </div>
 </template>
 
 <script>
-export default { 
-  name: 'HelloWorld',
-  
-  data(){ 
-    return { 
+export default {
+  name: "HelloWorld",
+
+  data() {
+    return {
       // to get value from input
-      // var for new task
-      task: '',
-      // var for edited task by user
+      newTask: "",
+      selectedPriority: "",
       editedTask: null,
-      availableStatus: ['to-do', 'in-progress', 'finished'],
+      isVisible: false,
+      availableStatus: ["to-do", "in-progress", "finished"],
 
       tasks: [
         {
-          id: 1, 
-          name: "Steal bananas from the supermarket.", 
+          id: 1,
+          name: "Steal bananas from the supermarket.",
           status: "to-do",
-          priority: "low" 
-        }, 
-        { 
+          priority: "low",
+        },
+        {
           id: 2,
-          name: "Eat 1 kg chocolate in 1 hour.", 
-          status: "in-progress", 
-          priority: "medium"
-        }, 
+          name: "Eat 1 kg chocolate in 1 hour.",
+          status: "in-progress",
+          priority: "medium",
+        },
         {
           id: 3,
-          name: "Create YouTube video.", 
-          status: "finished", 
-          priority: "high"
-        }, 
-        {
-          id: 4, 
-          name: "Create YouTube video.", 
-          status: "finished", 
-          priority: "urgent" 
+          name: "Create YouTube video.",
+          status: "finished",
+          priority: "high",
         },
-
-      ] 
-    } 
+        {
+          id: 4,
+          name: "Create YouTube video.",
+          status: "finished",
+          priority: "urgent",
+        },
+      ],
+    };
   },
-  
+
   methods: {
     submitTask() {
       // using v-model, we can get the value of the input tag
-      // console.log(this.task)
+      // console.log(this.newTask)
 
-      if(this.task.length === 0) { return }
+      if (this.newTask.length === 0 || this.selectedPriority.length === 0) {
+        this.isVisible = true;
+        return;
+      }
 
-      if(this.editedTask === null) {
+      if (this.editedTask === null) {
         this.tasks.push({
           id: Math.floor(Math.random() * 1001),
-          name: this.task,
-          status: 'to-do',
-          priority: 'low'
-        })
+          name: this.newTask,
+          status: "to-do",
+          priority: this.selectedPriority,
+        });
       } else {
         // this.editedTask return the index of the array that need to be edited
-        this.tasks[this.editedTask].name = this.task;
+        this.tasks[this.editedTask].name = this.newTask;
+        this.tasks[this.editedTask].priority = this.selectedPriority;
         this.editedTask = null;
       }
 
-      this.task = ''
+      this.newTask = "";
+      this.selectedPriority = "";
     },
 
-    deleteTask(index){
+    deleteTask(index) {
       // splice() - can add/remove items in array
       // at position index, remove 1 item
       this.tasks.splice(index, 1);
     },
 
-    editTask(index){
-      this.task = this.tasks[index].name;
+    editTask(index) {
+      this.newTask = this.tasks[index].name;
+      this.selectedPriority = this.tasks[index].priority;
       this.editedTask = index;
     },
 
-    changeStatus(index){
+    changeStatus(index) {
       let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
 
-      if(++newIndex > 2) { newIndex = 0 }
+      if (++newIndex > 2) {
+        newIndex = 0;
+      }
 
       // change status
       this.tasks[index].status = this.availableStatus[newIndex];
     },
 
-    firstCharUpper(str){
+    firstCharUpper(str) {
       // finished
       // str.charAt(0).toUpperCase() - f -> F
       // str.slice(1) - will take all -> inished
       return str.charAt(0).toUpperCase() + str.slice(1);
-    }
-  }
-}
-
+    },
+  },
+};
 </script>
 
 <style scoped>
-.pointer{
+.pointer {
   cursor: pointer;
 }
 
-.finished{
+.finished {
   text-decoration: line-through;
 }
 </style>
