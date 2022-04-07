@@ -3,9 +3,17 @@
     <h1>Hello World from TodoApp.vue</h1>
     <h2 class="text-center mt-5 mb-5">My Vue Todo App</h2>
 
+    <div>
+      <TestAPI></TestAPI>
+    </div>
+
     <!--- Input -->
     <div class="row g-3 d-flex justify-content-center mb-5">
-      <div class="alert alert-danger alert-dismissible fade show" role="alert" v-show="isVisible">
+      <div
+        class="alert alert-danger alert-dismissible fade show"
+        role="alert"
+        v-show="isVisible"
+      >
         <span class="fa-solid fa-triangle-exclamation"></span>
         Please ensure all the inputs are filled in!
         <button
@@ -18,10 +26,19 @@
       <div class="col-6 col-sm-6">
         <!-- v-model: 2-way binding -->
         <!-- in script tag, it is empty string but if we put value to it, it will appear in this input tag -->
-        <input v-model="newTask" type="text" class="form-control" placeholder="Enter task" />
+        <input
+          v-model="newTask"
+          type="text"
+          class="form-control"
+          placeholder="Enter task"
+        />
       </div>
       <div class="col-6 col-sm-6">
-        <select v-model="selectedPriority" class="form-select" aria-label="Default select example">
+        <select
+          v-model="selectedPriority"
+          class="form-select"
+          aria-label="Default select example"
+        >
           <option disabled value selected>Select Priority Level</option>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
@@ -30,7 +47,9 @@
         </select>
       </div>
       <div class="col-2">
-        <button type="button" @click="submitTask" class="btn btn-warning">SUBMIT</button>
+        <button type="button" @click="submitTask" class="btn btn-warning">
+          SUBMIT
+        </button>
       </div>
     </div>
 
@@ -49,14 +68,21 @@
         <tr v-for="(task, index) in tasks" :key="index">
           <td>{{ task.id }}</td>
           <td>
-            <span :class="{'finished': task.status === 'finished'}">{{ task.name }}</span>
+            <span :class="{ finished: task.status === 'finished' }">
+              {{ task.name }}
+            </span>
           </td>
           <td style="width: 120px">
             <span
               class="pointer fw-bold"
               @click="changeStatus(index)"
-              :class="{'text-danger': task.status === 'to-do', 'text-warning': task.status === 'in-progress', 'text-success': task.status === 'finished'}"
-            >{{ firstCharUpper(task.status) }}</span>
+              :class="{
+                'text-danger': task.status === 'to-do',
+                'text-warning': task.status === 'in-progress',
+                'text-success': task.status === 'finished',
+              }"
+              >{{ firstCharUpper(task.status) }}</span
+            >
           </td>
           <td>{{ firstCharUpper(task.priority) }}</td>
           <td>
@@ -76,8 +102,13 @@
 </template>
 
 <script>
+import TestAPI from "./TestAPI.vue";
+
 export default {
-  name: "HelloWorld",
+  name: "TodoApp",
+  components: {
+    TestAPI,
+  },
 
   data() {
     return {
@@ -87,6 +118,7 @@ export default {
       editedTask: null,
       isVisible: false,
       availableStatus: ["to-do", "in-progress", "finished"],
+      dataApi: null,
 
       tasks: [
         {
