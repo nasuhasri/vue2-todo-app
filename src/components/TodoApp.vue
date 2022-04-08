@@ -65,7 +65,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(task, index) in tasks" :key="index">
+        <tr v-for="(task, index) in dataApi" :key="index">
           <td>{{ task.id }}</td>
           <td>
             <span :class="{ finished: task.status === 'finished' }">
@@ -103,6 +103,8 @@
 
 <script>
 import TestAPI from "./TestAPI.vue";
+
+const axios = require("axios");
 
 export default {
   name: "TodoApp",
@@ -149,6 +151,18 @@ export default {
     };
   },
 
+  // display data when app is accessed
+  mounted() {
+    axios
+      .get("http://todo-api.test/api/todo")
+      .then((response) => {
+        this.dataApi = response.data.todos;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  },
+
   methods: {
     submitTask() {
       // using v-model, we can get the value of the input tag
@@ -166,6 +180,20 @@ export default {
           status: "to-do",
           priority: this.selectedPriority,
         });
+
+        axios
+          .post("http://todo-api.test/api/todo", {
+            name: this.newTask,
+            status: "to-do",
+            priority: this.selectedPriority,
+          })
+          .then((response) => {
+            // this.$forceUpdate(); // tak jadi
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
       } else {
         // this.editedTask return the index of the array that need to be edited
         this.tasks[this.editedTask].name = this.newTask;
@@ -175,6 +203,8 @@ export default {
 
       this.newTask = "";
       this.selectedPriority = "";
+
+      this.$forceUpdate();
     },
 
     deleteTask(index) {

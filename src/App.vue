@@ -5,14 +5,14 @@
 </template>
 
 <script>
-import TodoApp from './components/TodoApp.vue'
+import TodoApp from "./components/TodoApp.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    TodoApp
-  }
-}
+    TodoApp,
+  },
+};
 </script>
 
 <style>
