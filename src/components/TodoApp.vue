@@ -75,7 +75,7 @@
           <td style="width: 120px">
             <span
               class="pointer fw-bold"
-              @click="changeStatus(index)"
+              @click="changeStatus(index, task.id)"
               :class="{
                 'text-danger': task.status === 'to-do',
                 'text-warning': task.status === 'in-progress',
@@ -86,12 +86,12 @@
           </td>
           <td>{{ firstCharUpper(task.priority) }}</td>
           <td>
-            <div @click="editTask(index)">
+            <div @click="editTask(index, task.id)">
               <span class="fa fa-pen"></span>
             </div>
           </td>
           <td>
-            <div @click="deleteTask(index)">
+            <div @click="deleteTask(index, task.id)">
               <span class="fa fa-trash"></span>
             </div>
           </td>
@@ -121,6 +121,7 @@ export default {
       isVisible: false,
       availableStatus: ["to-do", "in-progress", "finished"],
       dataApi: null,
+      id: null,
 
       tasks: [
         {
@@ -173,7 +174,9 @@ export default {
         return;
       }
 
+      // submit new task
       if (this.editedTask === null) {
+        // submit data using dummy data and store in array
         this.tasks.push({
           id: Math.floor(Math.random() * 1001),
           name: this.newTask,
@@ -181,6 +184,7 @@ export default {
           priority: this.selectedPriority,
         });
 
+        // submit data to db using rest api
         axios
           .post("http://todo-api.test/api/todo", {
             name: this.newTask,
@@ -195,39 +199,83 @@ export default {
             console.log(error);
           });
       } else {
-        // this.editedTask return the index of the array that need to be edited
-        this.tasks[this.editedTask].name = this.newTask;
-        this.tasks[this.editedTask].priority = this.selectedPriority;
-        this.editedTask = null;
+        // edit task
+        try {
+          axios.put(`http://todo-api.test/api/todo/${this.id}`, {
+            name: this.newTask,
+            priority: this.selectedPriority,
+            status: this.dataApi[this.editedTask].status,
+          });
+
+          // this.editedTask return the index of the array that need to be edited
+          this.dataApi[this.editedTask].name = this.newTask;
+          this.dataApi[this.editedTask].priority = this.selectedPriority;
+
+          // make editedTask empty back
+          this.editedTask = null;
+        } catch (error) {
+          console.log(error);
+        }
       }
 
       this.newTask = "";
       this.selectedPriority = "";
-
-      this.$forceUpdate();
     },
 
-    deleteTask(index) {
-      // splice() - can add/remove items in array
+    deleteTask(index, id) {
+      // delete dummy data in array using array method
       // at position index, remove 1 item
       this.tasks.splice(index, 1);
+
+      // delete data using rest api
+      try {
+        axios
+          .delete(`http://todo-api.test/api/todo/${id}`)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+
+        // filter data so page will display updated data
+        // send task in arrow function where task.id !== id that has been deleted
+        this.dataApi = this.dataApi.filter((task) => task.id !== id);
+      } catch (error) {
+        console.log(error);
+      }
     },
 
-    editTask(index) {
-      this.newTask = this.tasks[index].name;
-      this.selectedPriority = this.tasks[index].priority;
+    editTask(index, id) {
+      this.newTask = this.dataApi[index].name;
+      this.selectedPriority = this.dataApi[index].priority;
+
       this.editedTask = index;
+      this.id = id;
     },
 
-    changeStatus(index) {
-      let newIndex = this.availableStatus.indexOf(this.tasks[index].status);
+    changeStatus(index, id) {
+      // get index of current task status
+      let newIndex = this.availableStatus.indexOf(this.dataApi[index].status);
 
+      // ++newIndex - next value
       if (++newIndex > 2) {
         newIndex = 0;
       }
 
-      // change status
-      this.tasks[index].status = this.availableStatus[newIndex];
+      try {
+        // change status in db
+        axios.put(`http://todo-api.test/api/todo/${id}`, {
+          name: this.dataApi[index].name,
+          status: this.availableStatus[newIndex],
+          priority: this.dataApi[index].priority,
+        });
+
+        // change status for page view
+        this.dataApi[index].status = this.availableStatus[newIndex];
+      } catch (error) {
+        console.log(error);
+      }
     },
 
     firstCharUpper(str) {
