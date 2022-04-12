@@ -3,10 +3,6 @@
     <h1>Hello World from TodoApp.vue</h1>
     <h2 class="text-center mt-5 mb-5">My Vue Todo App</h2>
 
-    <div>
-      <TestAPI></TestAPI>
-    </div>
-
     <!--- Input -->
     <div class="row g-3 d-flex justify-content-center mb-5">
       <div
@@ -102,15 +98,10 @@
 </template>
 
 <script>
-import TestAPI from "./TestAPI.vue";
-
 const axios = require("axios");
 
 export default {
   name: "TodoApp",
-  components: {
-    TestAPI,
-  },
 
   data() {
     return {
@@ -154,17 +145,21 @@ export default {
 
   // display data when app is accessed
   mounted() {
-    axios
-      .get("http://todo-api.test/api/todo")
-      .then((response) => {
-        this.dataApi = response.data.todos;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.getData();
   },
 
   methods: {
+    getData() {
+      axios
+        .get("http://todo-api.test/api/todo")
+        .then((response) => {
+          this.dataApi = response.data.todos;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+
     submitTask() {
       // using v-model, we can get the value of the input tag
       // console.log(this.newTask)
@@ -192,30 +187,33 @@ export default {
             priority: this.selectedPriority,
           })
           .then((response) => {
-            // this.$forceUpdate(); // tak jadi
-            console.log(response);
+            this.getData(); // to get updated data
           })
           .catch((error) => {
             console.log(error);
           });
       } else {
         // edit task
-        try {
-          axios.put(`http://todo-api.test/api/todo/${this.id}`, {
+        axios
+          .put(`http://todo-api.test/api/todo/${this.id}`, {
             name: this.newTask,
             priority: this.selectedPriority,
             status: this.dataApi[this.editedTask].status,
+          })
+          .then((response) => {
+            this.getData();
+          })
+          .catch((error) => {
+            console.log(error);
           });
 
-          // this.editedTask return the index of the array that need to be edited
-          this.dataApi[this.editedTask].name = this.newTask;
-          this.dataApi[this.editedTask].priority = this.selectedPriority;
+        /** code block for data array */
+        // this.editedTask return the index of the array that need to be edited
+        // this.dataApi[this.editedTask].name = this.newTask;
+        // this.dataApi[this.editedTask].priority = this.selectedPriority;
 
-          // make editedTask empty back
-          this.editedTask = null;
-        } catch (error) {
-          console.log(error);
-        }
+        // make editedTask empty back
+        this.editedTask = null;
       }
 
       this.newTask = "";
@@ -225,25 +223,21 @@ export default {
     deleteTask(index, id) {
       // delete dummy data in array using array method
       // at position index, remove 1 item
-      this.tasks.splice(index, 1);
+      // this.tasks.splice(index, 1);
 
       // delete data using rest api
-      try {
-        axios
-          .delete(`http://todo-api.test/api/todo/${id}`)
-          .then((response) => {
-            console.log(response);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
+      axios
+        .delete(`http://todo-api.test/api/todo/${id}`)
+        .then((response) => {
+          this.getData();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
-        // filter data so page will display updated data
-        // send task in arrow function where task.id !== id that has been deleted
-        this.dataApi = this.dataApi.filter((task) => task.id !== id);
-      } catch (error) {
-        console.log(error);
-      }
+      // filter data so page will display updated data
+      // send task in arrow function where task.id !== id that has been deleted
+      // this.dataApi = this.dataApi.filter((task) => task.id !== id);
     },
 
     editTask(index, id) {
@@ -263,19 +257,22 @@ export default {
         newIndex = 0;
       }
 
-      try {
-        // change status in db
-        axios.put(`http://todo-api.test/api/todo/${id}`, {
+      // change status in db
+      axios
+        .put(`http://todo-api.test/api/todo/${id}`, {
           name: this.dataApi[index].name,
           status: this.availableStatus[newIndex],
           priority: this.dataApi[index].priority,
+        })
+        .then((response) => {
+          this.getData();
+        })
+        .catch((error) => {
+          console.log(error);
         });
 
-        // change status for page view
-        this.dataApi[index].status = this.availableStatus[newIndex];
-      } catch (error) {
-        console.log(error);
-      }
+      // change status for page view
+      // this.dataApi[index].status = this.availableStatus[newIndex];
     },
 
     firstCharUpper(str) {
